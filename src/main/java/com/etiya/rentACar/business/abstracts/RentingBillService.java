@@ -6,6 +6,7 @@ import java.util.List;
 import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
 import com.etiya.rentACar.business.request.rentalRequests.CreateRentalRequest;
 import com.etiya.rentACar.business.request.rentalRequests.UpdateRentalRequest;
+import com.etiya.rentACar.business.request.rentingBillRequests.CreateRentingBillRequest;
 import com.etiya.rentACar.business.request.rentingBillRequests.DeleteRentingBillRequest;
 import com.etiya.rentACar.business.request.rentingBillRequests.UpdateRentingBillRequest;
 import com.etiya.rentACar.core.utilities.results.DataResult;
@@ -14,7 +15,7 @@ import com.etiya.rentACar.entities.RentingBill;
 
 public interface RentingBillService {
 	DataResult<List<RentingBillSearchListDto>> getAll();
-	Result save(UpdateRentalRequest updateRentalRequest);
+	Result save(CreateRentingBillRequest createRentingBillRequest);
 	Result delete(DeleteRentingBillRequest deleteRentingBillRequest);
 	Result update(UpdateRentingBillRequest updateRentingBillRequest);
 	DataResult<List<RentingBillSearchListDto>> getRentingBillByUserId(int userId);

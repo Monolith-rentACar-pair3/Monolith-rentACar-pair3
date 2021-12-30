@@ -48,4 +48,9 @@ public class LanguageManager implements LanguageService {
         this.languageDao.save(language);
         return new SuccessResult(messageService.getMessage(Messages.updateLanguage));
     }
+
+    @Override
+    public Language getByLanguageId(int languageId) {
+        return this.languageDao.getByLanguageId(languageId);
+    }
 }

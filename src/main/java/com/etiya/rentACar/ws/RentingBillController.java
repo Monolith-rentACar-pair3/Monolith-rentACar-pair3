@@ -3,11 +3,12 @@ package com.etiya.rentACar.ws;
 import java.sql.Date;
 import java.util.List;
 
+import com.etiya.rentACar.business.request.rentingBillRequests.CreateRentingBillRequest;
+import com.etiya.rentACar.business.request.rentingBillRequests.DeleteRentingBillRequest;
+import com.etiya.rentACar.business.request.rentingBillRequests.UpdateRentingBillRequest;
+import com.etiya.rentACar.core.utilities.results.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.etiya.rentACar.business.abstracts.RentingBillService;
 import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
@@ -36,5 +37,16 @@ public class RentingBillController {
 	public DataResult<List<RentingBillSearchListDto>> getBillsBetweenDates(@RequestParam Date startDate, @RequestParam Date endDate){
 		return this.rentingBillService.getRentingBillByDateInterval(startDate, endDate);
 	}
-	
+	@PostMapping("add")
+	public Result save(CreateRentingBillRequest createRentingBillRequest){
+		return this.rentingBillService.save(createRentingBillRequest);
+	}
+	@DeleteMapping("delete")
+	public Result delete(DeleteRentingBillRequest deleteRentingBillRequest){
+		return this.rentingBillService.delete(deleteRentingBillRequest);
+	}
+	@PutMapping("update")
+	public Result save(UpdateRentingBillRequest updateRentingBillRequest){
+		return this.rentingBillService.update(updateRentingBillRequest);
+	}
 }

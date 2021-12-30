@@ -111,7 +111,8 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         return new SuccessResult();
     }
 
-    private Result checkIfAdditionalServiceIdExists(int serviceId){
+    @Override
+    public Result checkIfAdditionalServiceIdExists(int serviceId){
         if (additionalServiceDao.existsByServiceId(serviceId)){
             return new SuccessResult();
         }

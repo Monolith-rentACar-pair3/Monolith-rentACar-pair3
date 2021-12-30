@@ -39,7 +39,4 @@ public class UpdateRentalRequest {
 	@NotNull
 	private int returnKilometer;
 
-	@ApiModelProperty(example = "1,2")
-	private String demandedAdditionalServices;
-
 }

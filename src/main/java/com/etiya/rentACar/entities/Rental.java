@@ -1,6 +1,7 @@
 package com.etiya.rentACar.entities;
 
 import java.sql.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -23,9 +24,6 @@ public class Rental {
 	
 	@Column(name="rent_date")
 	private Date rentDate;
-	
-	//@Column(name="individual_id")
-	//private int individualId;
 
 	@Column(name="return_date") 
 	private Date returnDate;
@@ -44,11 +42,11 @@ public class Rental {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(name = "demanded_additional_services")
-	private String demandedAdditionalServices;
-
 	@OneToOne(mappedBy = "rental")
 	private RentingBill rentingBill;
+
+	@OneToMany(mappedBy = "rental")
+	private List<DemandedAdditionalServicesForRentals> demandedAdditionalServicesForRentals;
 }
 
 

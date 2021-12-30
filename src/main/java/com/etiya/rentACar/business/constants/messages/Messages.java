@@ -103,6 +103,7 @@ public class Messages {
     public static String addRentingBill = "AddRentingBill";
     public static String deleteRentingBill = "DeleteRentingBill";
     public static String updateRentingBill = "UpdateRentingBill";
+    public static String rentingBillIdDoesNotExist = "RentingBillIdDoesNotExist";
 
     public static String addLanguage = "AddLanguage";
     public static String deleteLanguage = "DeleteLanguage";
@@ -115,5 +116,10 @@ public class Messages {
     public static String addMessage = "AddMessage";
     public static String deleteMessage = "DeleteMessage";
     public static String updateMessage = "UpdateMessage";
+
+    public static String addDemandedAdditional="AddDemandedAdditional";
+    public static String deleteDemandedAdditional="DeleteDemandedAdditional";
+    public static String updateDemandedAdditional= "UpdateDemandedAdditional";
+    public static String demandedAdditionalDoesNotExist = "DemandedAdditionalDoesNotExist";
 
 }

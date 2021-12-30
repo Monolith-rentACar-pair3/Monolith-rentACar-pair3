@@ -18,7 +18,9 @@ public interface RentalService {
 	Result delete(DeleteRentalRequest deleteRentalRequest);
 	Result update(UpdateRentalRequest updateRentalRequest);
 	Result checkCarIsReturned(int carId);
-	public DataResult<List<AdditionalService>> extractAdditionalServicesFromString(UpdateRentalRequest updateRentalRequest);
+	public DataResult<List<AdditionalService>> getAdditionalServices(Rental rental);
 	public Result checkIfEndDateIsAfterStartDate(Date endDate, Date startDate);
 	Rental getById(int rentalId);
+	Result checkIfBillIsAlreadyCreated(int rentalId);
+	Result checkIfRentalIdExists(int rentalId);
 }

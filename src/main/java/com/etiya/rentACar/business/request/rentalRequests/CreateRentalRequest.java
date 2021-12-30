@@ -36,7 +36,4 @@ public class CreateRentalRequest {
 	@NotNull
 	private int rentKilometer;
 
-	@ApiModelProperty(example = "1,2")
-	private String demandedAdditionalServices;
-
 }

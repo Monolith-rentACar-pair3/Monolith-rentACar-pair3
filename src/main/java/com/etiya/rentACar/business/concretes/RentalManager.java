@@ -39,6 +39,7 @@ public class RentalManager implements RentalService {
 	private CreditCardService creditCardService;
 	private AdditionalServiceService additionalServiceService;
 	private MessageService messageService;
+	private DemandedAdditionalServicesForRentalsService demandedAdditionalServicesForRentalsService;
 	
 	@Autowired
 	public RentalManager(RentalDao rentalDao, ModelMapperService modelMapperService, 
@@ -46,7 +47,8 @@ public class RentalManager implements RentalService {
 			@Lazy MaintenanceService maintenanceService,RentingBillService rentingBillService,
 						 PaymentApprovementService paymentApprovementService,
 						 CreditCardService creditCardService,
-						 AdditionalServiceService additionalServiceService, MessageService messageService) {
+						 AdditionalServiceService additionalServiceService, MessageService messageService,
+						 DemandedAdditionalServicesForRentalsService demandedAdditionalServicesForRentalsService) {
 		super();
 		this.rentalDao = rentalDao;
 		this.modelMapperService = modelMapperService;
@@ -58,6 +60,7 @@ public class RentalManager implements RentalService {
 		this.creditCardService = creditCardService;
 		this.additionalServiceService = additionalServiceService;
 		this.messageService = messageService;
+		this.demandedAdditionalServicesForRentalsService = demandedAdditionalServicesForRentalsService;
 	}
 
 	@Override
@@ -73,10 +76,8 @@ public class RentalManager implements RentalService {
 		Result result = BusinessRules.run(carService.checkExistingCar(createRentalRequest.getCarId()),
 				checkCarIsReturned(createRentalRequest.getCarId()),
 				checkFindeksPointAcceptability(createRentalRequest.getCarId(),createRentalRequest.getUserId()),
-				maintenanceService.checkIfCarIsOnMaintenance(createRentalRequest.getCarId()),
-				//checkIfPaymentSuccessful(creditCardService.getById(3)),
-				checkIfAdditionalServicesAreDeclaredInTrueFormat(createRentalRequest.getDemandedAdditionalServices()),
-				checkIfAdditionalServiceExists(createRentalRequest.getDemandedAdditionalServices()));
+				maintenanceService.checkIfCarIsOnMaintenance(createRentalRequest.getCarId()));
+				//checkIfPaymentSuccessful(creditCardService.getById(3)),;
 	
 		if(result != null) {
 			return result;
@@ -84,11 +85,6 @@ public class RentalManager implements RentalService {
 		updateCityNameIfReturnCityIsDifferent(createRentalRequest);
 		Rental rental = modelMapperService.forRequest().map(createRentalRequest, Rental.class);
 		this.rentalDao.save(rental);
-
-		/*if(createRentalRequest.getReturnDate() != null) {
-			this.rentingBillService.save(createRentalRequest);
-			return new SuccessResult("Rental log is added and renting bill is created.");	
-		}*/
 		
 		return new SuccessResult(messageService.getMessage(Messages.addRental));
 	}
@@ -108,9 +104,7 @@ public class RentalManager implements RentalService {
 	@Override
 	public Result update(UpdateRentalRequest updateRentalRequest) {
 		Result result = BusinessRules.run(checkIfEndDateIsAfterStartDate(updateRentalRequest.getReturnDate(), updateRentalRequest.getRentDate()),
-				checkIfAdditionalServicesAreDeclaredInTrueFormat(updateRentalRequest.getDemandedAdditionalServices()),
 				checkIfRentalIdExists(updateRentalRequest.getRentalId()),
-				checkIfBillIsAlreadyCreated(updateRentalRequest.getRentalId()),
 				checkIfReturnKilometerIsBiggerThanRentKilometer(updateRentalRequest.getReturnKilometer(),updateRentalRequest.getCarId()));
 		
 		if(result != null) {
@@ -119,11 +113,6 @@ public class RentalManager implements RentalService {
 		updateCityNameIfReturnCityIsDifferent(updateRentalRequest);
 		this.carService.updateCarKilometer(updateRentalRequest.getCarId(),updateRentalRequest.getReturnKilometer());
 		Rental rental = modelMapperService.forRequest().map(updateRentalRequest, Rental.class);
-		if (updateRentalRequest.getReturnDate() != null){
-			this.rentalDao.save(rental);
-			this.rentingBillService.save(updateRentalRequest);
-			return new SuccessResult(messageService.getMessage(Messages.updateAndCreateBill));
-		}
 		this.rentalDao.save(rental);
 		return new SuccessResult(messageService.getMessage(Messages.updateRental));
 	}
@@ -183,60 +172,24 @@ public class RentalManager implements RentalService {
 		return new SuccessResult();
 	}
 
-	public DataResult<List<AdditionalService>> extractAdditionalServicesFromString(UpdateRentalRequest updateRentalRequest) throws NoSuchElementException {
-		String services = updateRentalRequest.getDemandedAdditionalServices();
-		if(services == null){
-			return null;
+	public DataResult<List<AdditionalService>> getAdditionalServices(Rental rental) {
+		List<DemandedAdditionalServicesForRentals> list = this.demandedAdditionalServicesForRentalsService.getAllByRental(rental).getData();
+		List<AdditionalService> response = new ArrayList<AdditionalService>();
+		for (DemandedAdditionalServicesForRentals demandedAdditionalServicesForRentals : list) {
+			response.add(demandedAdditionalServicesForRentals.getAdditionalService());
 		}
-		if(services.equals("")){
-			return null;
-		}
-		String[] servicesArray = services.split(",");
-		List<AdditionalService> servicesAsElements = new ArrayList<AdditionalService>();
-		for (String service: servicesArray) {
-			boolean isExisting = additionalServiceService.isExisting(Integer.parseInt(service));
-			if (isExisting){
-				servicesAsElements.add(additionalServiceService.getById(Integer.parseInt(service)));
-			} else{
-				throw new NoSuchElementException("Service "+ service + " is not found!");
-			}
-		}
-		return new SuccessDataResult<List<AdditionalService>>(servicesAsElements);
+		return new SuccessDataResult<List<AdditionalService>>(response);
 	}
 
-	private Result checkIfAdditionalServicesAreDeclaredInTrueFormat(String demandedAdditionalServices){
-		String regex = "^[1-9]+(,[1-9]+)*$";
-		if (demandedAdditionalServices == null || demandedAdditionalServices == ""){
-			return new SuccessResult();
-		}
-		if (!demandedAdditionalServices.matches(regex)){
-			return new ErrorResult(messageService.getMessage(Messages.additionalServiceDeclaration));
-		}
-		return new SuccessResult();
-	}
-	private Result checkIfAdditionalServiceExists(String additionalServices){
-		if (additionalServices == null){
-			return new SuccessResult();
-		}
-		if (additionalServices.equals("")){
-			return new SuccessResult();
-		}
-		String[] servicesArray = additionalServices.split(",");
-		for (String service: servicesArray){
-			boolean isExisting = additionalServiceService.isExisting(Integer.parseInt(service));
-			if (!isExisting){
-				return new ErrorResult("Service " + service + " does not exists!");
-			}
-		}
-		return new SuccessResult();
-	}
-	private Result checkIfRentalIdExists(int rentalId) {
+	@Override
+	public Result checkIfRentalIdExists(int rentalId) {
 		if (this.rentalDao.existsById(rentalId)){
 			return new SuccessResult();
 		}
 		return new ErrorResult(messageService.getMessage(Messages.rentalIdDoesNotExist));
 	}
-	private Result checkIfBillIsAlreadyCreated(int rentalId){
+	@Override
+	public Result checkIfBillIsAlreadyCreated(int rentalId){
 		List<RentingBill> bills = rentingBillService.rentingBills();
 		for (RentingBill bill: bills) {
 			if (bill.getRental().getRentalId() == rentalId){

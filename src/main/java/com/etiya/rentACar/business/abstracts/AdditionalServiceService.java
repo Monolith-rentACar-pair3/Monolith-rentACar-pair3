@@ -21,4 +21,5 @@ public interface AdditionalServiceService {
     Result update(UpdateAdditionalServiceRequest updateAdditionalServiceRequest);
     AdditionalService getById(int serviceId);
     boolean isExisting(int serviceId);
+    Result checkIfAdditionalServiceIdExists(int serviceId);
 }

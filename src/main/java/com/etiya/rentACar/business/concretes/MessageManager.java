@@ -1,5 +1,6 @@
 package com.etiya.rentACar.business.concretes;
 
+import com.etiya.rentACar.business.abstracts.LanguageService;
 import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.business.request.messageRequests.CreateMessageRequest;
@@ -9,6 +10,7 @@ import com.etiya.rentACar.core.utilities.mapping.ModelMapperService;
 import com.etiya.rentACar.core.utilities.results.Result;
 import com.etiya.rentACar.core.utilities.results.SuccessResult;
 import com.etiya.rentACar.dataAccess.abstracts.MessageDao;
+import com.etiya.rentACar.entities.multipleLanguageMessages.Language;
 import com.etiya.rentACar.entities.multipleLanguageMessages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,14 +24,17 @@ public class MessageManager implements MessageService {
     private ModelMapperService modelMapperService;
     private MessageService messageService;
     private Environment environment;
+    private LanguageService languageService;
 
 
     @Autowired
-    public MessageManager(MessageDao messageDao, ModelMapperService modelMapperService, @Lazy MessageService messageService, Environment environment) {
+    public MessageManager(MessageDao messageDao, ModelMapperService modelMapperService, @Lazy MessageService messageService, Environment environment,
+                          @Lazy LanguageService languageService) {
         this.messageDao = messageDao;
         this.modelMapperService = modelMapperService;
         this.messageService=messageService;
         this.environment = environment;
+        this.languageService = languageService;
     }
 
     @Override
@@ -55,6 +60,15 @@ public class MessageManager implements MessageService {
 
     @Override
     public String getMessage(String messageKey) {
-        return this.messageDao.getMessage(Integer.parseInt(environment.getProperty("language.id")),messageKey);
+        int languageId = Integer.parseInt(environment.getProperty("language.id"));
+        Language language = languageService.getByLanguageId(languageId);
+        if (language == null){
+            languageId = 1;
+        }
+        String message = this.messageDao.getMessage(languageId,messageKey);
+        if (message==null){
+            message = messageKey;
+        }
+        return message;
     }
 }
