@@ -3,8 +3,10 @@ package com.etiya.rentACar.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.constants.messages.UserMessages;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.UserService;
@@ -28,12 +30,16 @@ public class UserManager implements UserService {
 	private UserDao userDao;
 	
 	private ModelMapperService modelMapperService;
+	private Environment environment;
+	private MessageService messageService;
 
 	@Autowired
-	public UserManager(UserDao userDao, ModelMapperService modelMapperService) {
+	public UserManager(UserDao userDao, ModelMapperService modelMapperService, Environment environment, MessageService messageService) {
 		super();
 		this.userDao = userDao;
 		this.modelMapperService = modelMapperService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -47,7 +53,7 @@ public class UserManager implements UserService {
 	@Override
 	public Result existsByEmail(String email) {
 		if (this.userDao.existsByeMail(email)) {
-			return new ErrorResult(UserMessages.emailDuplicate);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),29));
 		}
 		return new SuccessResult();
 	}
@@ -70,7 +76,7 @@ public class UserManager implements UserService {
 		if (this.userDao.existsById(id)){
 			return new SuccessResult();
 		}
-		return new ErrorResult(UserMessages.userDoesNotExist);
+		return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),30));
 	}
 
 }

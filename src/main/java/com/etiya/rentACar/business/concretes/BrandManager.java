@@ -3,8 +3,10 @@ package com.etiya.rentACar.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.constants.messages.BrandMessages;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.BrandService;
@@ -25,11 +27,15 @@ public class BrandManager implements BrandService{
 	
 	private BrandDao brandDao;
 	private ModelMapperService modelMapperService;
+	private Environment environment;
+	private MessageService messageService;
 	@Autowired
-	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService) {
+	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService, Environment environment, MessageService messageService) {
 		super();
 		this.brandDao = brandDao;
 		this.modelMapperService = modelMapperService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -52,7 +58,7 @@ public class BrandManager implements BrandService{
 		
 		Brand brand = modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 		this.brandDao.save(brand);
-		return new SuccessResult(BrandMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),6));
 	}
 
 	@Override
@@ -63,7 +69,7 @@ public class BrandManager implements BrandService{
 		}
 		Brand brand = modelMapperService.forRequest().map(deleteBrandRequest, Brand.class);
 		this.brandDao.delete(brand);	
-		return new SuccessResult(BrandMessages.delete);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),7));
 	}
 
 	@Override
@@ -76,7 +82,7 @@ public class BrandManager implements BrandService{
 		}
 		Brand brand = modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 		this.brandDao.save(brand);
-		return new SuccessResult(BrandMessages.update);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),8));
 	}
 	
 	private Result checkExistingBrand(String brandName1) {
@@ -84,7 +90,7 @@ public class BrandManager implements BrandService{
 		for (Brand brand : brandDao.findAll()) {
 			String lowerCaseExistingBrandName = brand.getBrandName().toLowerCase();
 			if(lowerCaseBrandName.equals(lowerCaseExistingBrandName)) {
-				return new ErrorResult(BrandMessages.duplicationError);
+				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),9));
 			}
 		}
 		return new SuccessResult();
@@ -93,7 +99,7 @@ public class BrandManager implements BrandService{
 	private Result checkExistingBrand(int brandId){
 		boolean isExisting = brandDao.existsById(brandId);
 		if (!isExisting){
-			return new ErrorResult(BrandMessages.brandIdNotFound);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),10));
 		}
 		return new SuccessResult();
 	}

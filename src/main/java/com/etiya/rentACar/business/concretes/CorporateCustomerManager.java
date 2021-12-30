@@ -3,6 +3,7 @@ package com.etiya.rentACar.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.abstracts.UserService;
 import com.etiya.rentACar.business.constants.messages.CorporateCustomerMessages;
 import com.etiya.rentACar.business.constants.messages.CreditCardMessages;
@@ -12,6 +13,7 @@ import com.etiya.rentACar.core.utilities.results.*;
 import com.etiya.rentACar.entities.IndividualCustomer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.CorporateCustomerService;
@@ -28,13 +30,18 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 	private ModelMapperService modelMapperService;
 	private CorporateCustomerDao corporateCustomerDao;
 	private UserService userService;
+	private Environment environment;
+	private MessageService messageService;
 	
 	@Autowired
-	public CorporateCustomerManager(ModelMapperService modelMapperService, CorporateCustomerDao corporateCustomerDao, UserService userService) {
+	public CorporateCustomerManager(ModelMapperService modelMapperService, CorporateCustomerDao corporateCustomerDao, UserService userService,
+									Environment environment, MessageService messageService) {
 		super();
 		this.modelMapperService = modelMapperService;
 		this.corporateCustomerDao = corporateCustomerDao;
 		this.userService = userService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -54,7 +61,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(createCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.save(corporateCustomer);
-		return new SuccessResult(CorporateCustomerMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),36));
 	}
 
 	@Override
@@ -65,7 +72,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(deleteCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.delete(corporateCustomer);
-		return new SuccessResult(CorporateCustomerMessages.delete);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),37));
 	}
 
 	@Override
@@ -77,7 +84,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(updateCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.save(corporateCustomer);
-		return new SuccessResult(CorporateCustomerMessages.update);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),38));
 	}
 
 	@Override
@@ -89,7 +96,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 	private Result checkIfUserIdExists(int userId){
 		CorporateCustomer corporateCustomer = corporateCustomerDao.getByUserId(userId);
 		if (corporateCustomer == null){
-			return new ErrorResult(UserMessages.userDoesNotExist);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),30));
 		}
 		return new SuccessResult();
 	}
@@ -99,7 +106,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 			return new SuccessResult();
 		}
 		else {
-			return new ErrorResult(CorporateCustomerMessages.invalidTaxNumberFormat);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),45));
 		}
 	}
 

@@ -1,14 +1,12 @@
 package com.etiya.rentACar.business.concretes;
 
+import com.etiya.rentACar.business.abstracts.*;
 import com.etiya.rentACar.business.constants.messages.CorporateCustomerMessages;
 import com.etiya.rentACar.business.constants.messages.IndividualCustomerMessages;
 import com.etiya.rentACar.business.constants.messages.LoginAndRegisterMessages;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.etiya.rentACar.business.abstracts.CorporateCustomerService;
-import com.etiya.rentACar.business.abstracts.IndividualCustomerService;
-import com.etiya.rentACar.business.abstracts.LoginService;
-import com.etiya.rentACar.business.abstracts.UserService;
 import com.etiya.rentACar.business.request.corporateCustomerRequests.CreateCorporateCustomerRequest;
 import com.etiya.rentACar.business.request.individualCustomerRequests.CreateIndividualCustomerRequest;
 import com.etiya.rentACar.business.request.loginAndRegister.LoginRequest;
@@ -27,14 +25,19 @@ public class LoginManager implements LoginService {
 	private ModelMapperService modelMapperService;
 	private IndividualCustomerService individualCustomerService;
 	private CorporateCustomerService corporateCustomerService;
+	private Environment environment;
+	private MessageService messageService;
 	
 	public LoginManager(UserService userService, ModelMapperService modelMapperService,
-			IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService) {
+			IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService,
+						Environment environment, MessageService messageService) {
 		super();
 		this.userService = userService;
 		this.modelMapperService = modelMapperService;
 		this.individualCustomerService = individualCustomerService;
 		this.corporateCustomerService = corporateCustomerService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public class LoginManager implements LoginService {
 		if (result != null) {
 			return result;
 		}
-		return new SuccessResult(LoginAndRegisterMessages.loginSuccessful);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),53));
 	}
 
 	@Override
@@ -57,7 +60,7 @@ public class LoginManager implements LoginService {
 		CreateIndividualCustomerRequest result = modelMapperService.forRequest()
 				.map(registerIndividualCustomerRequest, CreateIndividualCustomerRequest.class);
 		this.individualCustomerService.save(result);
-		return new SuccessResult(IndividualCustomerMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),50));
 	}
 	@Override
 	public Result corporateCustomerRegister(RegisterCorporateCustomerRequest registerCorporateCustomerRequest) {
@@ -70,7 +73,7 @@ public class LoginManager implements LoginService {
 		CreateCorporateCustomerRequest result = modelMapperService.forRequest()
 				.map(registerCorporateCustomerRequest, CreateCorporateCustomerRequest.class);
 		this.corporateCustomerService.save(result);
-		return new SuccessResult(CorporateCustomerMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),36));
 	}
 	
 	private Result checkCustomerByPassword(LoginRequest loginRequest) {
@@ -79,7 +82,7 @@ public class LoginManager implements LoginService {
 
 			if (!this.userService.getByEmail(loginRequest.getEmail()).getData().getPassword()
 					.equals(loginRequest.getPassword())) {
-				return new ErrorResult(LoginAndRegisterMessages.wrongPassword);
+				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),54));
 			}
 		}
 		return new SuccessResult();
@@ -88,14 +91,14 @@ public class LoginManager implements LoginService {
 	private Result checkCustomerByEmail(LoginRequest loginRequest) {
 
 		if (this.userService.existsByEmail(loginRequest.getEmail()).isSuccess()) {
-			return new ErrorResult(LoginAndRegisterMessages.wrongEmail);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),55));
 		}
 		return new SuccessResult();
 	}
 
 	private Result checkPasswordConfirmation(String password, String passwordConfirmation) {
 		if(!password.equals(passwordConfirmation)) {
-			return new ErrorResult(LoginAndRegisterMessages.passwordConfirmationError);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),56));
 		}
 		return new SuccessResult();
 	}

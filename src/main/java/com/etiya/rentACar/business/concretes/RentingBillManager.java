@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.etiya.rentACar.business.abstracts.RentalService;
+import com.etiya.rentACar.business.abstracts.*;
 import com.etiya.rentACar.business.constants.messages.RentalMessages;
-import com.etiya.rentACar.business.constants.messages.RentingBillMessages;
 import com.etiya.rentACar.business.constants.messages.UserMessages;
 import com.etiya.rentACar.business.request.rentingBillRequests.UpdateRentingBillRequest;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
@@ -15,11 +14,9 @@ import com.etiya.rentACar.core.utilities.results.*;
 import com.etiya.rentACar.entities.AdditionalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.etiya.rentACar.business.abstracts.CarService;
-import com.etiya.rentACar.business.abstracts.RentingBillService;
-import com.etiya.rentACar.business.abstracts.UserService;
 import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
 import com.etiya.rentACar.business.request.rentalRequests.CreateRentalRequest;
 import com.etiya.rentACar.business.request.rentalRequests.UpdateRentalRequest;
@@ -36,15 +33,21 @@ public class RentingBillManager implements RentingBillService {
 	private UserService userService;
 	private CarService carService;
 	private RentalService rentalService;
+	private Environment environment;
+	private MessageService messageService;
+
 	@Autowired
 	public RentingBillManager(RentingBillDao rentingBillDao, ModelMapperService modelMapperService,
-							  UserService userService, CarService carService, @Lazy RentalService rentalService) {
+							  UserService userService, CarService carService, @Lazy RentalService rentalService,
+							  Environment environment, MessageService messageService) {
 		super();
 		this.rentingBillDao = rentingBillDao;
 		this.modelMapperService = modelMapperService;
 		this.userService = userService;
 		this.carService = carService;
 		this.rentalService = rentalService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -72,21 +75,21 @@ public class RentingBillManager implements RentingBillService {
 				dailyPriceOfCar,totalRentDay,updateRentalRequest));
 		rentingBill.setRental(rentalService.getById(updateRentalRequest.getRentalId()));
 		rentingBillDao.save(rentingBill);
-		return new SuccessResult(RentingBillMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),73));
 	}
 
 	@Override
 	public Result delete(DeleteRentingBillRequest deleteRentingBillRequest) {
 		RentingBill rentingBill = modelMapperService.forRequest().map(deleteRentingBillRequest, RentingBill.class);
 		this.rentingBillDao.delete(rentingBill);
-		return new SuccessResult(RentingBillMessages.delete);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),74));
 	}
 
 	@Override
 	public Result update(UpdateRentingBillRequest updateRentingBillRequest) {
 		RentingBill rentingBill = modelMapperService.forRequest().map(updateRentingBillRequest, RentingBill.class);
 		this.rentingBillDao.save(rentingBill);
-		return new SuccessResult(RentingBillMessages.update);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),75));
 	}
 	
 	private int calculateDifferenceBetweenDays(Date endDate, Date startDate) {

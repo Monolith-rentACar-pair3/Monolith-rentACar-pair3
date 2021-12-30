@@ -5,9 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.abstracts.UserService;
-import com.etiya.rentACar.business.constants.messages.CreditCardMessages;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.CreditCardService;
@@ -34,13 +35,18 @@ public class CreditCardManager implements CreditCardService {
 	private CreditCardDao creditCardDao;
 	private ModelMapperService modelMapperService;
 	private UserService userService;
+	private Environment environment;
+	private MessageService messageService;
 	
 	@Autowired
-	public CreditCardManager(CreditCardDao creditCardDao, ModelMapperService modelMapperService, UserService userService) {
+	public CreditCardManager(CreditCardDao creditCardDao, ModelMapperService modelMapperService, UserService userService,
+							 Environment environment, MessageService messageService) {
 		super();
 		this.creditCardDao = creditCardDao;
 		this.modelMapperService = modelMapperService;
 		this.userService = userService;
+		this.environment = environment;
+		this.messageService = messageService;
 	}
 
 	@Override
@@ -60,7 +66,7 @@ public class CreditCardManager implements CreditCardService {
 		}
 		CreditCard creditCard = modelMapperService.forRequest().map(createCreditCardRequest, CreditCard.class);
 		this.creditCardDao.save(creditCard);
-		return new SuccessResult(CreditCardMessages.add);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),39));
 	}
 
 	@Override
@@ -72,7 +78,7 @@ public class CreditCardManager implements CreditCardService {
 		}
 		CreditCard creditCard = modelMapperService.forRequest().map(updateCreditCardRequest, CreditCard.class);
 		this.creditCardDao.save(creditCard);
-		return new SuccessResult(CreditCardMessages.update);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),41));
 	}
 
 	@Override
@@ -83,7 +89,7 @@ public class CreditCardManager implements CreditCardService {
 		}
 		CreditCard creditCard = modelMapperService.forRequest().map(deleteCreditCardRequest, CreditCard.class);
 		this.creditCardDao.delete(creditCard);
-		return new SuccessResult(CreditCardMessages.delete);
+		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),40));
 	}
 
 	@Override
@@ -97,7 +103,7 @@ public class CreditCardManager implements CreditCardService {
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(cardNumber);
 		if(!matcher.matches()) {
-			return new ErrorResult(CreditCardMessages.invalidCardNumberFormat);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),42));
 		}
 		return new SuccessResult();
 	}
@@ -107,7 +113,7 @@ public class CreditCardManager implements CreditCardService {
 			return new SuccessResult();
 		}
 		else {
-			return new ErrorResult(CreditCardMessages.invalidCvcFormat);
+			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),43));
 		}
 	}
 
@@ -115,7 +121,7 @@ public class CreditCardManager implements CreditCardService {
 		if(creditCardDao.existsById(cardID)){
 			return new SuccessResult();
 		}
-		return new ErrorResult(CreditCardMessages.cardIdDoesNotExist);
+		return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),44));
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.etiya.rentACar.business.concretes;
 
 import com.etiya.rentACar.business.abstracts.LanguageService;
+import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.request.languageRequests.CreateLanguageRequest;
 import com.etiya.rentACar.business.request.languageRequests.DeleteLanguageRequest;
 import com.etiya.rentACar.business.request.languageRequests.UpdateLanguageRequest;
@@ -10,17 +11,22 @@ import com.etiya.rentACar.core.utilities.results.SuccessResult;
 import com.etiya.rentACar.dataAccess.abstracts.LanguageDao;
 import com.etiya.rentACar.entities.multipleLanguageMessages.Language;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LanguageManager implements LanguageService {
     private LanguageDao languageDao;
     private ModelMapperService modelMapperService;
+    private Environment environment;
+    private MessageService messageService;
 
     @Autowired
-    public LanguageManager(LanguageDao languageDao, ModelMapperService modelMapperService) {
+    public LanguageManager(LanguageDao languageDao, ModelMapperService modelMapperService, Environment environment, MessageService messageService) {
         this.languageDao = languageDao;
         this.modelMapperService = modelMapperService;
+        this.environment = environment;
+        this.messageService = messageService;
     }
 
     @Override
