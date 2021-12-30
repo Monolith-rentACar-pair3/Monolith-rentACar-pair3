@@ -5,15 +5,11 @@ import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.abstracts.UserService;
-import com.etiya.rentACar.business.constants.messages.CorporateCustomerMessages;
-import com.etiya.rentACar.business.constants.messages.CreditCardMessages;
-import com.etiya.rentACar.business.constants.messages.UserMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.results.*;
-import com.etiya.rentACar.entities.IndividualCustomer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.CorporateCustomerService;
@@ -30,17 +26,15 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 	private ModelMapperService modelMapperService;
 	private CorporateCustomerDao corporateCustomerDao;
 	private UserService userService;
-	private Environment environment;
 	private MessageService messageService;
 	
 	@Autowired
 	public CorporateCustomerManager(ModelMapperService modelMapperService, CorporateCustomerDao corporateCustomerDao, UserService userService,
-									Environment environment, MessageService messageService) {
+									MessageService messageService) {
 		super();
 		this.modelMapperService = modelMapperService;
 		this.corporateCustomerDao = corporateCustomerDao;
 		this.userService = userService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -61,7 +55,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(createCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.save(corporateCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),36));
+		return new SuccessResult(messageService.getMessage(Messages.addCorporateCustomer));
 	}
 
 	@Override
@@ -72,7 +66,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(deleteCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.delete(corporateCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),37));
+		return new SuccessResult(messageService.getMessage(Messages.deleteCorporateCustomer));
 	}
 
 	@Override
@@ -84,7 +78,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 		}
 		CorporateCustomer corporateCustomer = modelMapperService.forRequest().map(updateCorporateCustomerRequest, CorporateCustomer.class);
 		this.corporateCustomerDao.save(corporateCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),38));
+		return new SuccessResult(messageService.getMessage(Messages.updateCorporateCustomer));
 	}
 
 	@Override
@@ -96,7 +90,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 	private Result checkIfUserIdExists(int userId){
 		CorporateCustomer corporateCustomer = corporateCustomerDao.getByUserId(userId);
 		if (corporateCustomer == null){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),30));
+			return new ErrorResult(messageService.getMessage(Messages.userDoesNotExist));
 		}
 		return new SuccessResult();
 	}
@@ -106,7 +100,7 @@ public class CorporateCustomerManager implements CorporateCustomerService{
 			return new SuccessResult();
 		}
 		else {
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),45));
+			return new ErrorResult(messageService.getMessage(Messages.invalidTaxNumberFormat));
 		}
 	}
 

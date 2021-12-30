@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.CarService;
 import com.etiya.rentACar.business.abstracts.MessageService;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -32,18 +33,16 @@ public class MaintenanceManager implements MaintenanceService{
 	private ModelMapperService modelMapperService;
 	private RentalService rentalService;
 	private CarService carService;
-	private Environment environment;
 	private MessageService messageService;
 	
 	@Autowired
 	public MaintenanceManager(MaintenanceDao maintenanceDao, ModelMapperService modelMapperService, RentalService rentalService, CarService carService,
-							  Environment environment, MessageService messageService) {
+							  MessageService messageService) {
 		super();
 		this.maintenanceDao = maintenanceDao;
 		this.modelMapperService = modelMapperService;
 		this.rentalService = rentalService;
 		this.carService = carService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -68,7 +67,7 @@ public class MaintenanceManager implements MaintenanceService{
 		
 		Maintenance maintenance = modelMapperService.forRequest().map(createMaintenanceRequest, Maintenance.class);
 		this.maintenanceDao.save(maintenance);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),57));
+		return new SuccessResult(messageService.getMessage(Messages.addMaintenance));
 	}
 
 	@Override
@@ -80,7 +79,7 @@ public class MaintenanceManager implements MaintenanceService{
 		}
 		Maintenance maintenance = modelMapperService.forRequest().map(deleteMaintenanceRequest, Maintenance.class);
 		this.maintenanceDao.delete(maintenance);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),58));
+		return new SuccessResult(messageService.getMessage(Messages.deleteMaintenance));
 	}
 
 	@Override
@@ -95,13 +94,13 @@ public class MaintenanceManager implements MaintenanceService{
 		}
 		Maintenance maintenance = modelMapperService.forRequest().map(updateMaintenanceRequest, Maintenance.class);
 		this.maintenanceDao.save(maintenance);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),59));
+		return new SuccessResult(messageService.getMessage(Messages.updateMaintenance));
 	}
 	
 	private Result checkIfCarIsRentedNow(int carId) {
 		Result isCarReturned = rentalService.checkCarIsReturned(carId);
 		if(!isCarReturned.isSuccess()) {
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),61));
+			return new ErrorResult(messageService.getMessage(Messages.maintenanceCarIsOnRental));
 		}
 		return new SuccessResult();
 	}
@@ -111,7 +110,7 @@ public class MaintenanceManager implements MaintenanceService{
 		if(maintenance != null) {
 			for (Maintenance maintenanceLog : maintenance) {
 				if(maintenanceLog.getEndDate() == null) {
-					return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),60));
+					return new ErrorResult(messageService.getMessage(Messages.carIsOnMaintenance));
 				}
 			}
 		}
@@ -120,7 +119,7 @@ public class MaintenanceManager implements MaintenanceService{
 	public Result checkExistingMaintenanceId(int maintenanceId){
 		boolean isExists = maintenanceDao.existsByMaintenanceId(maintenanceId);
 		if(!isExists){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),62));
+			return new ErrorResult(messageService.getMessage(Messages.maintenanceIdNotFound));
 		}
 		return new SuccessResult();
 	}

@@ -2,7 +2,6 @@ package com.etiya.rentACar.business.concretes;
 
 import com.etiya.rentACar.business.abstracts.AdditionalServiceService;
 import com.etiya.rentACar.business.abstracts.MessageService;
-import com.etiya.rentACar.business.constants.messages.AdditionalServiceMessages;
 import com.etiya.rentACar.business.dtos.AdditionalServiceSearchListDto;
 import com.etiya.rentACar.business.request.additionalServiceRequests.CreateAdditionalServiceRequest;
 import com.etiya.rentACar.business.request.additionalServiceRequests.DeleteAdditionalServiceRequest;
@@ -13,12 +12,10 @@ import com.etiya.rentACar.core.utilities.results.*;
 import com.etiya.rentACar.dataAccess.abstracts.AdditionalServiceDao;
 import com.etiya.rentACar.entities.AdditionalService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import com.etiya.rentACar.business.constants.messages.Messages;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +23,12 @@ public class AdditionalServiceManager implements AdditionalServiceService {
     private ModelMapperService modelMapperService;
     private AdditionalServiceDao additionalServiceDao;
     private MessageService messageService;
-    private Environment environment;
 
     @Autowired
-    public AdditionalServiceManager(ModelMapperService modelMapperService, AdditionalServiceDao additionalServiceDao, MessageService messageService, Environment environment) {
+    public AdditionalServiceManager(ModelMapperService modelMapperService, AdditionalServiceDao additionalServiceDao, MessageService messageService) {
         this.modelMapperService = modelMapperService;
         this.additionalServiceDao = additionalServiceDao;
         this.messageService = messageService;
-        this.environment = environment;
     }
 
     @Override
@@ -53,7 +48,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         AdditionalService additionalService = modelMapperService.forRequest().
                 map(createAdditionalServiceRequest, AdditionalService.class);
         this.additionalServiceDao.save(additionalService);
-        return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),1));
+        return new SuccessResult(messageService.getMessage(Messages.addAdditionalService));
     }
 
     @Override
@@ -65,7 +60,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         AdditionalService additionalService = modelMapperService.forRequest().
                 map(deleteAdditionalServiceRequest, AdditionalService.class);
         this.additionalServiceDao.delete(additionalService);
-        return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),2));
+        return new SuccessResult(messageService.getMessage(Messages.deleteAdditionalService));
     }
 
     @Override
@@ -78,7 +73,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         AdditionalService additionalService = modelMapperService.forRequest().
                 map(updateAdditionalServiceRequest, AdditionalService.class);
         this.additionalServiceDao.save(additionalService);
-        return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),3));
+        return new SuccessResult(messageService.getMessage(Messages.updateAdditionalService));
     }
 
     @Override
@@ -96,7 +91,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         for (AdditionalService service: additionalServiceDao.findAll()) {
             String lowerCaseService = service.getServiceName().toLowerCase();
             if(lowerCaseService.equals(lowerCaseServiceName)) {
-                return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),4));
+                return new ErrorResult(messageService.getMessage(Messages.existingServiceName));
             }
         }
         return new SuccessResult();
@@ -110,7 +105,7 @@ public class AdditionalServiceManager implements AdditionalServiceService {
             }
             String lowerCaseService = service.getServiceName().toLowerCase();
             if(lowerCaseService.equals(lowerCaseServiceName)) {
-                return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),4));
+                return new ErrorResult(messageService.getMessage(Messages.existingServiceName));
             }
         }
         return new SuccessResult();
@@ -120,6 +115,6 @@ public class AdditionalServiceManager implements AdditionalServiceService {
         if (additionalServiceDao.existsByServiceId(serviceId)){
             return new SuccessResult();
         }
-        return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),5));
+        return new ErrorResult(messageService.getMessage(Messages.serviceIdDoesNotExist));
     }
 }

@@ -6,24 +6,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.*;
-import com.etiya.rentACar.business.constants.messages.RentalMessages;
-import com.etiya.rentACar.business.constants.messages.UserMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.business.request.rentingBillRequests.UpdateRentingBillRequest;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.results.*;
 import com.etiya.rentACar.entities.AdditionalService;
+import com.etiya.rentACar.entities.multipleLanguageMessages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
-import com.etiya.rentACar.business.request.rentalRequests.CreateRentalRequest;
 import com.etiya.rentACar.business.request.rentalRequests.UpdateRentalRequest;
 import com.etiya.rentACar.business.request.rentingBillRequests.DeleteRentingBillRequest;
 import com.etiya.rentACar.core.utilities.mapping.ModelMapperService;
 import com.etiya.rentACar.dataAccess.abstracts.RentingBillDao;
 import com.etiya.rentACar.entities.RentingBill;
+
 
 @Service
 public class RentingBillManager implements RentingBillService {
@@ -33,20 +32,18 @@ public class RentingBillManager implements RentingBillService {
 	private UserService userService;
 	private CarService carService;
 	private RentalService rentalService;
-	private Environment environment;
 	private MessageService messageService;
 
 	@Autowired
 	public RentingBillManager(RentingBillDao rentingBillDao, ModelMapperService modelMapperService,
 							  UserService userService, CarService carService, @Lazy RentalService rentalService,
-							  Environment environment, MessageService messageService) {
+							  MessageService messageService) {
 		super();
 		this.rentingBillDao = rentingBillDao;
 		this.modelMapperService = modelMapperService;
 		this.userService = userService;
 		this.carService = carService;
 		this.rentalService = rentalService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -75,21 +72,21 @@ public class RentingBillManager implements RentingBillService {
 				dailyPriceOfCar,totalRentDay,updateRentalRequest));
 		rentingBill.setRental(rentalService.getById(updateRentalRequest.getRentalId()));
 		rentingBillDao.save(rentingBill);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),73));
+		return new SuccessResult(messageService.getMessage(Messages.addRentingBill));
 	}
 
 	@Override
 	public Result delete(DeleteRentingBillRequest deleteRentingBillRequest) {
 		RentingBill rentingBill = modelMapperService.forRequest().map(deleteRentingBillRequest, RentingBill.class);
 		this.rentingBillDao.delete(rentingBill);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),74));
+		return new SuccessResult(messageService.getMessage(Messages.deleteRentingBill));
 	}
 
 	@Override
 	public Result update(UpdateRentingBillRequest updateRentingBillRequest) {
 		RentingBill rentingBill = modelMapperService.forRequest().map(updateRentingBillRequest, RentingBill.class);
 		this.rentingBillDao.save(rentingBill);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),75));
+		return new SuccessResult(messageService.getMessage(Messages.updateRentingBill));
 	}
 	
 	private int calculateDifferenceBetweenDays(Date endDate, Date startDate) {
@@ -101,7 +98,7 @@ public class RentingBillManager implements RentingBillService {
 	public DataResult<List<RentingBillSearchListDto>> getRentingBillByUserId(int userId) {
 		Result result = BusinessRules.run(userService.existsById(userId));
 		if (result != null){
-			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, UserMessages.userDoesNotExist);
+			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, Messages.userDoesNotExist);
 		}
 		List<RentingBill> list = rentingBillDao.getByUser_UserId(userId);
 		List<RentingBillSearchListDto> response = list.stream().map(rentingBill -> modelMapperService.forDto().
@@ -113,7 +110,7 @@ public class RentingBillManager implements RentingBillService {
 	public DataResult<List<RentingBillSearchListDto>> getRentingBillByDateInterval(Date startDate, Date endDate) {
 		Result result = BusinessRules.run(rentalService.checkIfEndDateIsAfterStartDate(endDate,startDate));
 		if (result != null){
-			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, RentalMessages.dateAccordance);
+			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, Messages.dateAccordance);
 		}
 		List<RentingBill> list = rentingBillDao.findByCreationDateBetween(startDate, endDate);
 		List<RentingBillSearchListDto> response = list.stream().map(rentingBill -> modelMapperService.forDto().

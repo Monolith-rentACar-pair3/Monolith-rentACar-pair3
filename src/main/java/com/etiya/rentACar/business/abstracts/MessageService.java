@@ -9,5 +9,5 @@ public interface MessageService {
     Result save(CreateMessageRequest createMessageRequest);
     Result delete(DeleteMessageRequest deleteMessageRequest);
     Result update(UpdateMessageRequest updateMessageRequest);
-    String getMessage(int languageId, int messageKeyId);
+    String getMessage(String messageKey);
 }

@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.MessageService;
-import com.etiya.rentACar.business.constants.messages.BrandMessages;
-import com.etiya.rentACar.business.constants.messages.ColorMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.results.ErrorResult;
-import com.etiya.rentACar.entities.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -29,15 +27,13 @@ public class ColorManager implements ColorService{
 	
 	private ColorDao colorDao;
 	private ModelMapperService modelMapperService;
-	private Environment environment;
 	private MessageService messageService;
 	
 	@Autowired
-	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService, Environment environment, MessageService messageService) {
+	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService, MessageService messageService) {
 		super();
 		this.colorDao = colorDao;
 		this.modelMapperService = modelMapperService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -61,7 +57,7 @@ public class ColorManager implements ColorService{
 		}
 		Color color = modelMapperService.forRequest().map(createColorRequest, Color.class);
 		this.colorDao.save(color);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),31));
+		return new SuccessResult(messageService.getMessage(Messages.addColor));
 	}
 
 
@@ -73,7 +69,7 @@ public class ColorManager implements ColorService{
 		}
 		Color color = modelMapperService.forRequest().map(deleteColorRequest, Color.class);
 		this.colorDao.delete(color);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),32));
+		return new SuccessResult(messageService.getMessage(Messages.deleteColor));
 	}
 
 
@@ -85,7 +81,7 @@ public class ColorManager implements ColorService{
 		}
 		Color color = modelMapperService.forRequest().map(updateColorRequest, Color.class);
 		this.colorDao.save(color);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),33));
+		return new SuccessResult(messageService.getMessage(Messages.updateColor));
 	}
 
 	private Result checkExistingColor(String colorName1) {
@@ -93,7 +89,7 @@ public class ColorManager implements ColorService{
 		for (Color color : colorDao.findAll()) {
 			String lowerCaseExistingColorName = color.getColorName().toLowerCase();
 			if(lowerCaseColorName.equals(lowerCaseExistingColorName)) {
-				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),34));
+				return new ErrorResult(messageService.getMessage(Messages.colorDuplicationError));
 			}
 		}
 		return new SuccessResult();
@@ -103,6 +99,6 @@ public class ColorManager implements ColorService{
 		if (colorDao.existsById(colorId)){
 			return new SuccessResult();
 		}
-		return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),35));
+		return new ErrorResult(messageService.getMessage(Messages.colorIdNotFound));
 	}
 }

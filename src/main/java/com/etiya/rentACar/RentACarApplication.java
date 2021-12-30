@@ -5,13 +5,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import com.etiya.rentACar.business.abstracts.MessageService;
-import com.etiya.rentACar.business.constants.messages.ExceptionMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -36,11 +35,9 @@ import javax.persistence.EntityNotFoundException;
 @EnableSwagger2
 @RestControllerAdvice
 public class RentACarApplication {
-	private Environment environment;
 	private MessageService messageService;
 
-	public RentACarApplication(@Lazy Environment environment,@Lazy MessageService messageService) {
-		this.environment = environment;
+	public RentACarApplication(@Lazy MessageService messageService) {
 		this.messageService = messageService;
 	}
 
@@ -87,7 +84,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
 
-		ErrorResult error = new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),46));
+		ErrorResult error = new ErrorResult(messageService.getMessage(Messages.wrongInput));
 		return error;
 	}
 
@@ -95,7 +92,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
 
-		ErrorResult error = new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),46));
+		ErrorResult error = new ErrorResult(messageService.getMessage(Messages.wrongInput));
 		return error;
 	}
 
@@ -103,7 +100,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleEntityNotFoundException(EntityNotFoundException exception) {
 
-		ErrorResult error = new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),46));
+		ErrorResult error = new ErrorResult(messageService.getMessage(Messages.wrongInput));
 		return error;
 	}
 
@@ -111,7 +108,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleNumberFormatException(NumberFormatException exception) {
 
-		ErrorResult error = new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),46));
+		ErrorResult error = new ErrorResult(messageService.getMessage(Messages.wrongInput));
 		return error;
 	}
 
@@ -119,7 +116,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
 
-	ErrorResult error = new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),47));
+	ErrorResult error = new ErrorResult(messageService.getMessage(Messages.argumentTypeMismatch));
 	return error;
 }
 }

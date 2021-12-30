@@ -13,19 +13,18 @@ import com.etiya.rentACar.entities.multipleLanguageMessages.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import com.etiya.rentACar.business.constants.messages.Messages;
 
 @Service
 public class LanguageManager implements LanguageService {
     private LanguageDao languageDao;
     private ModelMapperService modelMapperService;
-    private Environment environment;
     private MessageService messageService;
 
     @Autowired
-    public LanguageManager(LanguageDao languageDao, ModelMapperService modelMapperService, Environment environment, MessageService messageService) {
+    public LanguageManager(LanguageDao languageDao, ModelMapperService modelMapperService, MessageService messageService) {
         this.languageDao = languageDao;
         this.modelMapperService = modelMapperService;
-        this.environment = environment;
         this.messageService = messageService;
     }
 
@@ -33,20 +32,20 @@ public class LanguageManager implements LanguageService {
     public Result save(CreateLanguageRequest createLanguageRequest) {
         Language language = modelMapperService.forRequest().map(createLanguageRequest, Language.class);
         this.languageDao.save(language);
-        return new SuccessResult("");
+        return new SuccessResult(messageService.getMessage(Messages.addLanguage));
     }
 
     @Override
     public Result delete(DeleteLanguageRequest deleteLanguageRequest) {
         Language language = modelMapperService.forRequest().map(deleteLanguageRequest, Language.class);
         this.languageDao.delete(language);
-        return new SuccessResult("");
+        return new SuccessResult(messageService.getMessage(Messages.deleteLanguage));
     }
 
     @Override
     public Result update(UpdateLanguageRequest updateLanguageRequest) {
         Language language = modelMapperService.forRequest().map(updateLanguageRequest, Language.class);
         this.languageDao.save(language);
-        return new SuccessResult("");
+        return new SuccessResult(messageService.getMessage(Messages.updateLanguage));
     }
 }

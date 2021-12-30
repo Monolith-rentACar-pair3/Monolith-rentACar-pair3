@@ -7,10 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.*;
-import com.etiya.rentACar.business.constants.messages.AdditionalServiceMessages;
-import com.etiya.rentACar.business.constants.messages.ExternalServiceMessages;
-import com.etiya.rentACar.business.constants.messages.RentalMessages;
-import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.core.utilities.adapters.findeksServiceAdapter.FinancialDataService;
 import com.etiya.rentACar.core.utilities.adapters.posServiceAdapter.PaymentApprovementService;
 import com.etiya.rentACar.core.utilities.results.*;
@@ -18,7 +15,6 @@ import com.etiya.rentACar.entities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.dtos.RentalSearchListDto;
@@ -28,6 +24,7 @@ import com.etiya.rentACar.business.request.rentalRequests.UpdateRentalRequest;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.mapping.ModelMapperService;
 import com.etiya.rentACar.dataAccess.abstracts.RentalDao;
+import com.etiya.rentACar.business.constants.messages.Messages;
 
 @Service
 public class RentalManager implements RentalService {
@@ -41,7 +38,6 @@ public class RentalManager implements RentalService {
 	private PaymentApprovementService paymentApprovementService;
 	private CreditCardService creditCardService;
 	private AdditionalServiceService additionalServiceService;
-	private Environment environment;
 	private MessageService messageService;
 	
 	@Autowired
@@ -50,8 +46,7 @@ public class RentalManager implements RentalService {
 			@Lazy MaintenanceService maintenanceService,RentingBillService rentingBillService,
 						 PaymentApprovementService paymentApprovementService,
 						 CreditCardService creditCardService,
-						 AdditionalServiceService additionalServiceService,
-						 Environment environment, MessageService messageService) {
+						 AdditionalServiceService additionalServiceService, MessageService messageService) {
 		super();
 		this.rentalDao = rentalDao;
 		this.modelMapperService = modelMapperService;
@@ -62,7 +57,6 @@ public class RentalManager implements RentalService {
 		this.paymentApprovementService = paymentApprovementService;
 		this.creditCardService = creditCardService;
 		this.additionalServiceService = additionalServiceService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -96,7 +90,7 @@ public class RentalManager implements RentalService {
 			return new SuccessResult("Rental log is added and renting bill is created.");	
 		}*/
 		
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),63));
+		return new SuccessResult(messageService.getMessage(Messages.addRental));
 	}
 
 	@Override
@@ -108,7 +102,7 @@ public class RentalManager implements RentalService {
 		}
 		Rental rental = modelMapperService.forRequest().map(deleteRentalRequest, Rental.class);
 		this.rentalDao.delete(rental);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),64));
+		return new SuccessResult(messageService.getMessage(Messages.deleteRental));
 	}
 
 	@Override
@@ -128,10 +122,10 @@ public class RentalManager implements RentalService {
 		if (updateRentalRequest.getReturnDate() != null){
 			this.rentalDao.save(rental);
 			this.rentingBillService.save(updateRentalRequest);
-			return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),66));
+			return new SuccessResult(messageService.getMessage(Messages.updateAndCreateBill));
 		}
 		this.rentalDao.save(rental);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),65));
+		return new SuccessResult(messageService.getMessage(Messages.updateRental));
 	}
 	
 	public Result checkCarIsReturned(int carId) {
@@ -139,7 +133,7 @@ public class RentalManager implements RentalService {
 		if(result != null) {
 			for (Rental rentals : this.rentalDao.getByCar_CarId(carId)) {
 				if(rentals.getReturnDate() == null) {
-					return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),67));
+					return new ErrorResult(messageService.getMessage(Messages.rentalCarIsOnRental));
 				}
 			}
 		}
@@ -151,7 +145,7 @@ public class RentalManager implements RentalService {
 		int findeksCar = car.getFindeksPointCar();
 		int findeksUser = financialDataService.getFindeksScore(userId);
 		if(findeksCar>findeksUser) {
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),48));
+			return new ErrorResult(messageService.getMessage(Messages.findexPointIsNotEnough));
 		}
 		return new SuccessResult();
 	}
@@ -159,7 +153,7 @@ public class RentalManager implements RentalService {
 	public Result checkIfEndDateIsAfterStartDate(Date endDate, Date startDate) {
 		if(endDate != null) {
 			if(endDate.before(startDate)) {
-				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),69));
+				return new ErrorResult(messageService.getMessage(Messages.dateAccordance));
 			}
 		}
 		return new SuccessResult();
@@ -184,7 +178,7 @@ public class RentalManager implements RentalService {
 		//creditCard.setCardNumber("");
 		boolean result = paymentApprovementService.checkPaymentSuccess(creditCard);
 		if(result==false){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),49));
+			return new ErrorResult(messageService.getMessage(Messages.paymentUnsuccessful));
 		}
 		return new SuccessResult();
 	}
@@ -216,7 +210,7 @@ public class RentalManager implements RentalService {
 			return new SuccessResult();
 		}
 		if (!demandedAdditionalServices.matches(regex)){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),68));
+			return new ErrorResult(messageService.getMessage(Messages.additionalServiceDeclaration));
 		}
 		return new SuccessResult();
 	}
@@ -240,13 +234,13 @@ public class RentalManager implements RentalService {
 		if (this.rentalDao.existsById(rentalId)){
 			return new SuccessResult();
 		}
-		return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),70));
+		return new ErrorResult(messageService.getMessage(Messages.rentalIdDoesNotExist));
 	}
 	private Result checkIfBillIsAlreadyCreated(int rentalId){
 		List<RentingBill> bills = rentingBillService.rentingBills();
 		for (RentingBill bill: bills) {
 			if (bill.getRental().getRentalId() == rentalId){
-				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),71));
+				return new ErrorResult(messageService.getMessage(Messages.rentalAlreadyCreated));
 			}
 		}
 		return new SuccessResult();
@@ -254,7 +248,7 @@ public class RentalManager implements RentalService {
 
 	private Result checkIfReturnKilometerIsBiggerThanRentKilometer(int returnKilometer, int carId){
 		if(returnKilometer <= carService.getCarAsElementByCarId(carId).getKilometer()){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),72));
+			return new ErrorResult(messageService.getMessage(Messages.invalidReturnKilometer));
 		}
 		return new SuccessResult();
 	}

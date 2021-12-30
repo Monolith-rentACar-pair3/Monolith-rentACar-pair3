@@ -5,16 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.*;
-import com.etiya.rentACar.business.constants.messages.CarDamageMessages;
-import com.etiya.rentACar.business.constants.messages.CarMessages;
-import com.etiya.rentACar.business.constants.messages.CorporateCustomerMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.business.dtos.CarDamageSearchListDto;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.results.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.dtos.CarDetailDto;
@@ -37,13 +34,12 @@ public class CarManager implements CarService {
 	private MaintenanceService maintenanceService;
 	private CarDamageService carDamageService;
 	private CityService cityService;
-	private Environment environment;
 	private MessageService messageService;
 
 	@Autowired
 	public CarManager(CarDao carDao, ModelMapperService modelMapperService, @Lazy CarImageService carImageService,
 					  @Lazy MaintenanceService maintenanceService, @Lazy CarDamageService carDamageService,CityService cityService,
-					  Environment environment, MessageService messageService) {
+					  MessageService messageService) {
 		super();
 		this.carDao = carDao;
 		this.modelMapperService = modelMapperService;
@@ -51,7 +47,6 @@ public class CarManager implements CarService {
 		this.maintenanceService = maintenanceService;
 		this.carDamageService = carDamageService;
 		this.cityService = cityService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -73,7 +68,7 @@ public class CarManager implements CarService {
 		}
 		Car car = modelMapperService.forRequest().map(createCarRequest, Car.class);
 		this.carDao.save(car);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),21));
+		return new SuccessResult(messageService.getMessage(Messages.addCar));
 	}
 
 	@Override
@@ -84,7 +79,7 @@ public class CarManager implements CarService {
 		}
 		Car car = modelMapperService.forRequest().map(deleteCarRequest, Car.class);
 		this.carDao.delete(car);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),22));
+		return new SuccessResult(messageService.getMessage(Messages.deleteCar));
 	}
 
 	@Override
@@ -96,7 +91,7 @@ public class CarManager implements CarService {
 
 		Car car = modelMapperService.forRequest().map(updateCarRequest, Car.class);
 		this.carDao.save(car);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),23));
+		return new SuccessResult(messageService.getMessage(Messages.updateCar));
 	}
 
 	@Override
@@ -111,7 +106,7 @@ public class CarManager implements CarService {
 		List<Car> cars = this.carDao.getByBrand_BrandId(brandId);
 		if (cars.isEmpty()){
 			return new ErrorDataResult<List<CarSearchListDto>>(null,
-					messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),26));
+					messageService.getMessage(Messages.carListIsEmpty));
 		}
 		List<CarSearchListDto> response = cars.stream().map(car -> modelMapperService.forDto()
 				.map(car, CarSearchListDto.class)).collect(Collectors.toList());
@@ -124,7 +119,7 @@ public class CarManager implements CarService {
 		List<Car> cars = this.carDao.getByColor_ColorId(colorId);
 		if (cars.isEmpty()){
 			return new ErrorDataResult<List<CarSearchListDto>>(null,
-					messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),26));
+					messageService.getMessage(Messages.carListIsEmpty));
 		}
 		List<CarSearchListDto> response = cars.stream().map(car -> modelMapperService.forDto()
 				.map(car, CarSearchListDto.class)).collect(Collectors.toList());
@@ -137,7 +132,7 @@ public class CarManager implements CarService {
 		List<Car> list = carDao.getByCity(cityService.getByCityId(cityId));
 		if (list.isEmpty()){
 			return new ErrorDataResult<List<CarSearchListDto>>(null,
-					messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),26));
+					messageService.getMessage(Messages.carListIsEmpty));
 		}
 		List<CarSearchListDto> result = list.stream().map(car -> modelMapperService.forDto().
 				map(car, CarSearchListDto.class)).collect(Collectors.toList());
@@ -150,7 +145,7 @@ public class CarManager implements CarService {
 		Result result = BusinessRules.run(checkExistingCar(carId));
 		if (result != null) {
 			return new ErrorDataResult<CarDetailDto>(null,
-					messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),24));
+					messageService.getMessage(Messages.carNotFound));
 		}
 		Car car = this.carDao.getById(carId);
 		CarDetailDto carDetailDto = modelMapperService.forDto().map(car, CarDetailDto.class);
@@ -180,7 +175,7 @@ public class CarManager implements CarService {
 	public Result checkExistingCar(int carId) {
 		boolean isExist = carDao.existsById(carId);
 		if (!isExist) {
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),24));
+			return new ErrorResult(messageService.getMessage(Messages.carNotFound));
 		}
 		return new SuccessResult();
 	}
@@ -242,7 +237,7 @@ public class CarManager implements CarService {
 			list.add(carDamageSearchListDto.getDamageDescription());
 		}
 		if (list.size() == 0){
-			list.add(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),14));
+			list.add(messageService.getMessage(Messages.carDamageNotFound));
 		}
 		return list;
 	}
@@ -252,7 +247,7 @@ public class CarManager implements CarService {
 			return new SuccessResult();
 		}
 		else {
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),25));
+			return new ErrorResult(messageService.getMessage(Messages.invalidModelYearFormat));
 		}
 	}
 

@@ -9,13 +9,9 @@ import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.CarService;
 import com.etiya.rentACar.business.abstracts.MessageService;
-import com.etiya.rentACar.business.constants.messages.CarDamageMessages;
-import com.etiya.rentACar.business.constants.messages.CarImageMessages;
-import com.etiya.rentACar.business.constants.messages.CarMessages;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.core.utilities.results.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.CarImageService;
@@ -36,18 +32,16 @@ public class CarImageManager implements CarImageService {
 	private CarImageDao carImageDao;
 	private ModelMapperService modelMapperService;
 	private CarService carService;
-	private Environment environment;
 	private MessageService messageService;
 	FileHelper fileHelper = new FileHelperManager();
 
 	@Autowired
 	public CarImageManager(CarImageDao carImageDao, ModelMapperService modelMapperService, CarService carService,
-						   Environment environment, MessageService messageService) {
+						   MessageService messageService) {
 		super();
 		this.carImageDao = carImageDao;
 		this.modelMapperService = modelMapperService;
 		this.carService = carService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -78,7 +72,7 @@ public class CarImageManager implements CarImageService {
 		carImage.setImagePath(
 				fileHelper.returnFilePath(createCarImageRequest.getCarId()).getMessage() + "\\" + carImageName);
 		this.carImageDao.save(carImage);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),16));
+		return new SuccessResult(messageService.getMessage(Messages.addCarImage));
 	}
 
 	@Override
@@ -87,7 +81,7 @@ public class CarImageManager implements CarImageService {
 		String toBeDeletedPath = carImage.getImagePath();
 		fileHelper.deleteImage(toBeDeletedPath);
 		this.carImageDao.delete(carImage);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),17));
+		return new SuccessResult(messageService.getMessage(Messages.deleteCarImage));
 	}
 
 	@Override
@@ -101,14 +95,14 @@ public class CarImageManager implements CarImageService {
 		carImage.setImagePath(
 				fileHelper.returnFilePath(updateCarImageRequest.getCarId()).getMessage() + "\\" + carImageName);
 		this.carImageDao.save(carImage);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),18));
+		return new SuccessResult(messageService.getMessage(Messages.updateCarImage));
 	}
 
 	public DataResult<List<CarImageSearchListDto>> getCarImageByCarId(int carId) {
 		Result result1 = BusinessRules.run(carService.checkExistingCar(carId));
 		if (result1 != null){
 			return new ErrorDataResult<List<CarImageSearchListDto>>(null,
-					messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),24));
+					messageService.getMessage(Messages.carNotFound));
 		}
 		Result resultCheck = BusinessRules.run(checkIfThereIsNoPicture(carId));
 		if (resultCheck != null) {
@@ -135,7 +129,7 @@ public class CarImageManager implements CarImageService {
 		if (file.exists()) {
 			int numberOfFiles = file.listFiles().length;
 			if (numberOfFiles >= 5) {
-				return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),19));
+				return new ErrorResult(messageService.getMessage(Messages.upperImageLimit));
 			}
 		}
 		return new SuccessResult();
@@ -156,7 +150,7 @@ public class CarImageManager implements CarImageService {
 
 	private Result checkIfAnyPhotoIsImported(CreateCarImageRequest createCarImageRequest){
 		if (createCarImageRequest.getMultipartFile() == null){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),20));
+			return new ErrorResult(messageService.getMessage(Messages.noImage));
 		}
 		return new SuccessResult();
 	}

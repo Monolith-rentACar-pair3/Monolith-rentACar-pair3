@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.abstracts.UserService;
+import com.etiya.rentACar.business.constants.messages.Messages;
 import com.etiya.rentACar.core.utilities.business.BusinessRules;
 import com.etiya.rentACar.core.utilities.results.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +27,14 @@ public class IndividualCustomerManager implements IndividualCustomerService{
 	private IndividualCustomerDao individualCustomerDao;
 	private ModelMapperService modelMapperService;
 	private UserService userService;
-	private Environment environment;
 	private MessageService messageService;
 	@Autowired
 	public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService, UserService userService,
-									 Environment environment, MessageService messageService) {
+									 MessageService messageService) {
 		super();
 		this.individualCustomerDao = individualCustomerDao;
 		this.modelMapperService = modelMapperService;
 		this.userService = userService;
-		this.environment = environment;
 		this.messageService = messageService;
 	}
 
@@ -55,7 +54,7 @@ public class IndividualCustomerManager implements IndividualCustomerService{
 		}
 		IndividualCustomer individualCustomer = modelMapperService.forRequest().map(createIndividualCustomerRequest, IndividualCustomer.class);
 		this.individualCustomerDao.save(individualCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),50));
+		return new SuccessResult(messageService.getMessage(Messages.addIndividualCustomer));
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class IndividualCustomerManager implements IndividualCustomerService{
 		}
 		IndividualCustomer individualCustomer = modelMapperService.forRequest().map(deleteIndividualCustomerRequest, IndividualCustomer.class);
 		this.individualCustomerDao.delete(individualCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),51));
+		return new SuccessResult(messageService.getMessage(Messages.deleteIndividualCustomer));
 	}
 
 	@Override
@@ -77,7 +76,7 @@ public class IndividualCustomerManager implements IndividualCustomerService{
 		}
 		IndividualCustomer individualCustomer = modelMapperService.forRequest().map(updateIndividualCustomerRequest, IndividualCustomer.class);
 		this.individualCustomerDao.save(individualCustomer);
-		return new SuccessResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),52));
+		return new SuccessResult(messageService.getMessage(Messages.updateIndividualCustomer));
 	}
 
 	@Override
@@ -89,7 +88,7 @@ public class IndividualCustomerManager implements IndividualCustomerService{
 	private Result checkIfUserIdExists(int userId){
 		IndividualCustomer individualCustomer = individualCustomerDao.getByUserId(userId);
 		if (individualCustomer == null){
-			return new ErrorResult(messageService.getMessage(Integer.parseInt(environment.getProperty("language.id")),30));
+			return new ErrorResult(messageService.getMessage(Messages.userDoesNotExist));
 		}
 		return new SuccessResult();
 	}
