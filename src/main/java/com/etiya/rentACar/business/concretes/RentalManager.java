@@ -193,7 +193,7 @@ public class RentalManager implements RentalService {
 		List<RentingBill> bills = rentingBillService.rentingBills();
 		for (RentingBill bill: bills) {
 			if (bill.getRental().getRentalId() == rentalId){
-				return new ErrorResult(messageService.getMessage(Messages.rentalAlreadyCreated));
+				return new ErrorResult(messageService.getMessage(Messages.rentalIdAlreadyExistsInBillTable));
 			}
 		}
 		return new SuccessResult();
