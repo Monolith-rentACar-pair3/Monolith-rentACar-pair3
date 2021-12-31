@@ -8,11 +8,14 @@ import com.etiya.rentACar.business.request.rentingBillRequests.DeleteRentingBill
 import com.etiya.rentACar.business.request.rentingBillRequests.UpdateRentingBillRequest;
 import com.etiya.rentACar.core.utilities.results.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import com.etiya.rentACar.business.abstracts.RentingBillService;
 import com.etiya.rentACar.business.dtos.RentingBillSearchListDto;
 import com.etiya.rentACar.core.utilities.results.DataResult;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/rentingBills")
@@ -42,11 +45,11 @@ public class RentingBillController {
 		return this.rentingBillService.save(createRentingBillRequest);
 	}
 	@DeleteMapping("delete")
-	public Result delete(DeleteRentingBillRequest deleteRentingBillRequest){
+	public Result delete(@RequestBody @Valid DeleteRentingBillRequest deleteRentingBillRequest){
 		return this.rentingBillService.delete(deleteRentingBillRequest);
-	} 
+	}
 	@PutMapping("update")
-	public Result update(UpdateRentingBillRequest updateRentingBillRequest){
+	public Result update(@RequestBody @Valid UpdateRentingBillRequest updateRentingBillRequest){
 		return this.rentingBillService.update(updateRentingBillRequest);
 	}
 }

@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateRentingBillRequest {
-	@NotNull
-	private Date creationDate;
 	
 	@NotNull
+	@ApiModelProperty(example = "1970-01-01")
 	private Date rentingStartDate;
 	
 	@NotNull
+	@ApiModelProperty(example = "1970-01-01")
 	private Date rentingEndDate;
 	
 	@NotNull
@@ -32,4 +33,7 @@ public class UpdateRentingBillRequest {
 	
 	@NotNull
 	private int billId;
+
+	@NotNull
+	private int rentalId;
 }

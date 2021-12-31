@@ -107,6 +107,7 @@ public class Messages {
     public static String deleteRentingBill = "DeleteRentingBill";
     public static String updateRentingBill = "UpdateRentingBill";
     public static String rentingBillIdDoesNotExist = "RentingBillIdDoesNotExist";
+    public static String rentalIdAlreadyExistsInBillTable = "RentalIdAlreadyExistsInBillTable";
 
     public static String addLanguage = "AddLanguage";
     public static String deleteLanguage = "DeleteLanguage";

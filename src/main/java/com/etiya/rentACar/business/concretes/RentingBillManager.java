@@ -90,11 +90,14 @@ public class RentingBillManager implements RentingBillService {
 
 	@Override
 	public Result update(UpdateRentingBillRequest updateRentingBillRequest) {
-		Result result = BusinessRules.run(checkIfRentingBillIdExist(updateRentingBillRequest.getBillId()));
+		Result result = BusinessRules.run(checkIfRentingBillIdExist(updateRentingBillRequest.getBillId()),
+				checkIfRentalIdIsUsedBefore(updateRentingBillRequest.getBillId(),updateRentingBillRequest.getRentalId()));
 		if (result != null){
 			return result;
 		}
+		Date dateNow = new java.sql.Date(new java.util.Date().getTime());
 		RentingBill rentingBill = modelMapperService.forRequest().map(updateRentingBillRequest, RentingBill.class);
+		rentingBill.setCreationDate(dateNow);
 		this.rentingBillDao.save(rentingBill);
 		return new SuccessResult(messageService.getMessage(Messages.updateRentingBill));
 	}
@@ -156,6 +159,19 @@ public class RentingBillManager implements RentingBillService {
 			return new SuccessResult();
 		}
 		return new ErrorResult(messageService.getMessage(Messages.rentingBillIdDoesNotExist));
+	}
+
+	private Result checkIfRentalIdIsUsedBefore(int billId, int rentalId){
+		List<RentingBill> list = this.rentingBillDao.findAll();
+		for (RentingBill rentingBill : list) {
+			if (rentingBill.getBillId() == billId){
+				continue;
+			}
+			if(rentingBill.getRental().getRentalId() == rentalId){
+				return new ErrorResult(messageService.getMessage(Messages.rentalIdAlreadyExistsInBillTable));
+			}
+		}
+		return new SuccessResult();
 	}
 
 }
