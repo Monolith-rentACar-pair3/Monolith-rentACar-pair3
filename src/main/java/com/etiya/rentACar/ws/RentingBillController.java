@@ -46,7 +46,7 @@ public class RentingBillController {
 		return this.rentingBillService.delete(deleteRentingBillRequest);
 	}
 	@PutMapping("update")
-	public Result save(UpdateRentingBillRequest updateRentingBillRequest){
+	public Result update(UpdateRentingBillRequest updateRentingBillRequest){
 		return this.rentingBillService.update(updateRentingBillRequest);
 	}
 }

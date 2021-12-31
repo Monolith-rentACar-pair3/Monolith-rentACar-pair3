@@ -69,6 +69,9 @@ public class Messages {
 
     public static String wrongInput = "WrongInput";
     public static String argumentTypeMismatch = "ArgumentTypeMismatch";
+    public static String validationErrors = "ValidationErrors";
+    public static String noSuchElementException = "NoSuchElementException";
+
 
     public static String findexPointIsNotEnough = "FindexPointIsNotEnough";
     public static String paymentUnsuccessful = "PaymentUnsuccessful";

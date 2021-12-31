@@ -108,7 +108,7 @@ public class RentingBillManager implements RentingBillService {
 	public DataResult<List<RentingBillSearchListDto>> getRentingBillByUserId(int userId) {
 		Result result = BusinessRules.run(userService.existsById(userId));
 		if (result != null){
-			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, Messages.userDoesNotExist);
+			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, messageService.getMessage(Messages.userDoesNotExist));
 		}
 		List<RentingBill> list = rentingBillDao.getByUser_UserId(userId);
 		List<RentingBillSearchListDto> response = list.stream().map(rentingBill -> modelMapperService.forDto().
@@ -120,7 +120,7 @@ public class RentingBillManager implements RentingBillService {
 	public DataResult<List<RentingBillSearchListDto>> getRentingBillByDateInterval(Date startDate, Date endDate) {
 		Result result = BusinessRules.run(rentalService.checkIfEndDateIsAfterStartDate(endDate,startDate));
 		if (result != null){
-			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, Messages.dateAccordance);
+			return new ErrorDataResult<List<RentingBillSearchListDto>>(null, messageService.getMessage(Messages.dateAccordance));
 		}
 		List<RentingBill> list = rentingBillDao.findByCreationDateBetween(startDate, endDate);
 		List<RentingBillSearchListDto> response = list.stream().map(rentingBill -> modelMapperService.forDto().

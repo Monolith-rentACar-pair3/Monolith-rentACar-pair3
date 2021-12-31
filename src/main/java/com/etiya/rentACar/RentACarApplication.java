@@ -68,7 +68,7 @@ public class RentACarApplication {
 			validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
 		}
 
-		ErrorDataResult<Object> error = new ErrorDataResult<Object>(validationErrors, "Validation Errors");
+		ErrorDataResult<Object> error = new ErrorDataResult<Object>(validationErrors, messageService.getMessage(Messages.validationErrors));
 		return error;
 	}
 
@@ -76,7 +76,7 @@ public class RentACarApplication {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResult handleNoSuchElementException(NoSuchElementException exception) {
 
-		ErrorResult error = new ErrorResult("No such element exception. " + exception.getMessage());
+		ErrorResult error = new ErrorResult(messageService.getMessage(Messages.noSuchElementException) + exception.getMessage());
 		return error;
 	}
 
