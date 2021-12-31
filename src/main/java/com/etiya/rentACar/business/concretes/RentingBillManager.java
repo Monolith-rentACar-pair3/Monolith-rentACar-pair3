@@ -57,7 +57,9 @@ public class RentingBillManager implements RentingBillService {
 
 	@Override
 	public Result save(CreateRentingBillRequest createRentingBillRequest) {
-		Result result = BusinessRules.run(rentalService.checkIfBillIsAlreadyCreated(createRentingBillRequest.getRentalId()));
+		Result result = BusinessRules.run(rentalService.checkIfRentalIdExists(createRentingBillRequest.getRentalId()),
+				rentalService.checkIfBillIsAlreadyCreated(createRentingBillRequest.getRentalId()),
+				rentalService.checkIfReturnDateIsNull(createRentingBillRequest.getRentalId()));
 		if (result != null){
 			return result;
 		}
@@ -69,7 +71,7 @@ public class RentingBillManager implements RentingBillService {
 		rentingBill.setRentingEndDate(rental.getReturnDate());
 		rentingBill.setUser(rental.getUser());
 		int totalRentDay = calculateDifferenceBetweenDays(rental.getReturnDate(), rental.getRentDate());
-		rentingBill.setTotalRentingDay(totalRentDay);
+		rentingBill.setTotalRentingDay(totalRentDay+1);
 		int dailyPriceOfCar = (int)(carService.getCarDetailsByCarId(rental.getCar().getCarId()).getData().getDailyPrice());
 		rentingBill.setRentingPrice(calculateRentingPrice(dailyPriceOfCar,totalRentDay,rental));
 		rentingBill.setRental(rentalService.getById(rental.getRentalId()));
@@ -91,13 +93,16 @@ public class RentingBillManager implements RentingBillService {
 	@Override
 	public Result update(UpdateRentingBillRequest updateRentingBillRequest) {
 		Result result = BusinessRules.run(checkIfRentingBillIdExist(updateRentingBillRequest.getBillId()),
-				checkIfRentalIdIsUsedBefore(updateRentingBillRequest.getBillId(),updateRentingBillRequest.getRentalId()));
+				checkIfRentalIdIsUsedBefore(updateRentingBillRequest.getBillId(),updateRentingBillRequest.getRentalId()),
+				rentalService.checkIfReturnDateIsNull(updateRentingBillRequest.getRentalId()));
 		if (result != null){
 			return result;
 		}
 		Date dateNow = new java.sql.Date(new java.util.Date().getTime());
 		RentingBill rentingBill = modelMapperService.forRequest().map(updateRentingBillRequest, RentingBill.class);
 		rentingBill.setCreationDate(dateNow);
+		int totalRentDay = calculateDifferenceBetweenDays(updateRentingBillRequest.getRentingEndDate(), updateRentingBillRequest.getRentingStartDate());
+		rentingBill.setTotalRentingDay(totalRentDay+1);
 		this.rentingBillDao.save(rentingBill);
 		return new SuccessResult(messageService.getMessage(Messages.updateRentingBill));
 	}

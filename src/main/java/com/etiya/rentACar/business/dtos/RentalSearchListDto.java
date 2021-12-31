@@ -18,6 +18,5 @@ public class RentalSearchListDto {
 	private Date returnDate;
 	private String rentCity;
 	private String returnCity;
-	private String additionalServices;
 	
 }

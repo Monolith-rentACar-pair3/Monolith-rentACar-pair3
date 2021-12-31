@@ -23,9 +23,6 @@ public class UpdateRentingBillRequest {
 	private Date rentingEndDate;
 	
 	@NotNull
-	private int totalRentingDay;
-	
-	@NotNull
 	private int rentingPrice;
 	
 	@NotNull

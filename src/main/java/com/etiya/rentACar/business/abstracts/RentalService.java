@@ -23,4 +23,5 @@ public interface RentalService {
 	Rental getById(int rentalId);
 	Result checkIfBillIsAlreadyCreated(int rentalId);
 	Result checkIfRentalIdExists(int rentalId);
+	Result checkIfReturnDateIsNull(int rentalId);
 }

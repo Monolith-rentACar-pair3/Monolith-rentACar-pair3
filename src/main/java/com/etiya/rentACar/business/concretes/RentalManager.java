@@ -205,4 +205,12 @@ public class RentalManager implements RentalService {
 		}
 		return new SuccessResult();
 	}
+	@Override
+	public Result checkIfReturnDateIsNull(int rentalId){
+		Date endDate = rentalDao.getById(rentalId).getReturnDate();
+		if (endDate == null){
+			return new ErrorResult(messageService.getMessage(Messages.returnDateIsNull));
+		}
+		return new SuccessResult();
+	}
 }
