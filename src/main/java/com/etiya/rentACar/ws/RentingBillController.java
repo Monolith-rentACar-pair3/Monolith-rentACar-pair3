@@ -41,7 +41,7 @@ public class RentingBillController {
 		return this.rentingBillService.getRentingBillByDateInterval(startDate, endDate);
 	}
 	@PostMapping("add")
-	public Result save(CreateRentingBillRequest createRentingBillRequest){
+	public Result save(@RequestBody @Valid CreateRentingBillRequest createRentingBillRequest){
 		return this.rentingBillService.save(createRentingBillRequest);
 	}
 	@DeleteMapping("delete")
