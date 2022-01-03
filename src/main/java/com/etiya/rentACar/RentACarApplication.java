@@ -118,5 +118,5 @@ public class RentACarApplication {
 
 	ErrorResult error = new ErrorResult(messageService.getMessage(Messages.argumentTypeMismatch));
 	return error;
-}
+	}
 }

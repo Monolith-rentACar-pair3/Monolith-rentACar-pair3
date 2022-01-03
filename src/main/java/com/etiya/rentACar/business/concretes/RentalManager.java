@@ -77,7 +77,7 @@ public class RentalManager implements RentalService {
 				checkCarIsReturned(createRentalRequest.getCarId()),
 				checkFindeksPointAcceptability(createRentalRequest.getCarId(),createRentalRequest.getUserId()),
 				maintenanceService.checkIfCarIsOnMaintenance(createRentalRequest.getCarId()));
-				//checkIfPaymentSuccessful(creditCardService.getById(3)),;
+
 	
 		if(result != null) {
 			return result;
@@ -105,7 +105,8 @@ public class RentalManager implements RentalService {
 	public Result update(UpdateRentalRequest updateRentalRequest) {
 		Result result = BusinessRules.run(checkIfEndDateIsAfterStartDate(updateRentalRequest.getReturnDate(), updateRentalRequest.getRentDate()),
 				checkIfRentalIdExists(updateRentalRequest.getRentalId()),
-				checkIfReturnKilometerIsBiggerThanRentKilometer(updateRentalRequest.getReturnKilometer(),updateRentalRequest.getCarId()));
+				checkIfReturnKilometerIsBiggerThanRentKilometer(updateRentalRequest.getReturnKilometer(),updateRentalRequest.getCarId()),
+				checkIfPaymentSuccessful(3));
 		
 		if(result != null) {
 			return result;
@@ -163,8 +164,11 @@ public class RentalManager implements RentalService {
 			this.carService.updateCarCity(updateRentalRequest.getCarId(),updateRentalRequest.getReturnCity());
 		}
 	}
-	private Result checkIfPaymentSuccessful(CreditCard creditCard){
-		//creditCard.setCardNumber("");
+	private Result checkIfPaymentSuccessful(int creditCardId){
+		if (!creditCardService.checkIfCardIdExists(creditCardId).isSuccess()){
+			return new ErrorResult(messageService.getMessage(Messages.paymentUnsuccessful));
+		}
+		CreditCard creditCard = creditCardService.getById(creditCardId);
 		boolean result = paymentApprovementService.checkPaymentSuccess(creditCard);
 		if(result==false){
 			return new ErrorResult(messageService.getMessage(Messages.paymentUnsuccessful));

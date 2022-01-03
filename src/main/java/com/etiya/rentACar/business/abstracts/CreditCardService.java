@@ -17,4 +17,5 @@ public interface CreditCardService {
 	Result update(UpdateCreditCardRequest updateCreditCardRequest);
 	Result delete(DeleteCreditCardRequest deleteCreditCardRequest);
 	CreditCard getById(int cardId);
+	Result checkIfCardIdExists(int cardID);
 }

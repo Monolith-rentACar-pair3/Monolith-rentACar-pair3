@@ -116,7 +116,8 @@ public class CreditCardManager implements CreditCardService {
 		}
 	}
 
-	private Result checkIfCardIdExists(int cardID){
+	@Override
+	public Result checkIfCardIdExists(int cardID){
 		if(creditCardDao.existsById(cardID)){
 			return new SuccessResult();
 		}
