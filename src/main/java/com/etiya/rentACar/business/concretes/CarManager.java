@@ -107,19 +107,22 @@ public class CarManager implements CarService {
 	@Override
 	public DataResult<List<CarSearchListDto>> getByBrandId(int brandId) {
 		List<Car> cars = this.carDao.getByBrand_BrandId(brandId);
-		if (cars.isEmpty()){
-			return new ErrorDataResult<List<CarSearchListDto>>(null,
-					messageService.getMessage(Messages.carListIsEmpty));
-		}
-		List<CarSearchListDto> response = cars.stream().map(car -> modelMapperService.forDto()
-				.map(car, CarSearchListDto.class)).collect(Collectors.toList());
-		List<CarSearchListDto> finalResponse = deleteCarsOnMaintenanceFromCarSearchListDtoList(response);
-		return new SuccessDataResult<List<CarSearchListDto>>(finalResponse);
+		return getListResult(cars);
 	}
 
 	@Override
 	public DataResult<List<CarSearchListDto>> getByColorId(int colorId) {
 		List<Car> cars = this.carDao.getByColor_ColorId(colorId);
+		return getListResult(cars);
+	}
+
+	@Override
+	public DataResult<List<CarSearchListDto>> getByCity(int cityId) {
+		List<Car> cars = carDao.getByCity(cityService.getByCityId(cityId));
+		return getListResult(cars);
+	}
+
+	private DataResult<List<CarSearchListDto>> getListResult(List<Car> cars) {
 		if (cars.isEmpty()){
 			return new ErrorDataResult<List<CarSearchListDto>>(null,
 					messageService.getMessage(Messages.carListIsEmpty));
@@ -128,19 +131,6 @@ public class CarManager implements CarService {
 				.map(car, CarSearchListDto.class)).collect(Collectors.toList());
 		List<CarSearchListDto> finalResponse = deleteCarsOnMaintenanceFromCarSearchListDtoList(response);
 		return new SuccessDataResult<List<CarSearchListDto>>(finalResponse);
-	}
-
-	@Override
-	public DataResult<List<CarSearchListDto>> getByCity(int cityId) {
-		List<Car> list = carDao.getByCity(cityService.getByCityId(cityId));
-		if (list.isEmpty()){
-			return new ErrorDataResult<List<CarSearchListDto>>(null,
-					messageService.getMessage(Messages.carListIsEmpty));
-		}
-		List<CarSearchListDto> result = list.stream().map(car -> modelMapperService.forDto().
-				map(car, CarSearchListDto.class)).collect(Collectors.toList());
-		List<CarSearchListDto> response = deleteCarsOnMaintenanceFromCarSearchListDtoList(result);
-		return new SuccessDataResult<List<CarSearchListDto>>(response);
 	}
 
 	@Override
