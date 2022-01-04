@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.etiya.rentACar.business.constants.paths.Paths;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.etiya.rentACar.core.utilities.results.Result;
@@ -13,6 +16,12 @@ import com.etiya.rentACar.core.utilities.results.SuccessResult;
 
 
 public class FileHelperManager implements FileHelper {
+
+	private Environment environment;
+
+	public FileHelperManager(Environment environment) {
+		this.environment = environment;
+	}
 
 	@Override
 	public Result saveImage(int carId, MultipartFile multipartFile) throws IOException {
@@ -58,7 +67,7 @@ public class FileHelperManager implements FileHelper {
 		return new SuccessResult(newImageName);
 	}
 	public Result returnFilePath(int carId) {
-		String path = "img\\car" + carId;
+		String path = this.environment.getProperty(Paths.IMAGESUBFOLDER) + carId;
 		return new SuccessResult(path);
 	}
 

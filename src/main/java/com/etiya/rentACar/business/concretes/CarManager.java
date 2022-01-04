@@ -13,6 +13,7 @@ import com.etiya.rentACar.core.utilities.results.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.dtos.CarDetailDto;
@@ -36,11 +37,12 @@ public class CarManager implements CarService {
 	private CarDamageService carDamageService;
 	private CityService cityService;
 	private MessageService messageService;
+	private Environment environment;
 
 	@Autowired
 	public CarManager(CarDao carDao, ModelMapperService modelMapperService, @Lazy CarImageService carImageService,
 					  @Lazy MaintenanceService maintenanceService, @Lazy CarDamageService carDamageService,CityService cityService,
-					  MessageService messageService) {
+					  MessageService messageService, Environment environment) {
 		super();
 		this.carDao = carDao;
 		this.modelMapperService = modelMapperService;
@@ -49,6 +51,7 @@ public class CarManager implements CarService {
 		this.carDamageService = carDamageService;
 		this.cityService = cityService;
 		this.messageService = messageService;
+		this.environment = environment;
 	}
 
 	@Override
@@ -216,7 +219,7 @@ public class CarManager implements CarService {
 			list.add(image.getImagePath());
 		}
 		if (list.size() == 0) {
-			list.add(Paths.DEFAULTIMAGEPATH);
+			list.add(environment.getProperty(Paths.DEFAULTIMAGEPATH));
 		}
 		return list;
 	}
