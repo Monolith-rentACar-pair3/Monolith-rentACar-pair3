@@ -5,9 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.etiya.rentACar.business.constants.paths.Paths;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.etiya.rentACar.core.utilities.results.Result;
@@ -42,16 +40,6 @@ public class FileHelperManager implements FileHelper {
 		File file = new File(imagePath);
 		file.delete();
 		}
-		return new SuccessResult();
-	}
-
-	@Override
-	public Result updateImage(MultipartFile multipartFile, String imagePath) {
-		if (!imagePath.isEmpty()) {
-			File file = new File(imagePath);
-			file.delete();
-			}
-		
 		return new SuccessResult();
 	}
 	
