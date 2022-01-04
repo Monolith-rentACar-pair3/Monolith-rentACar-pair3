@@ -3,6 +3,7 @@ package com.etiya.rentACar.business.concretes;
 import com.etiya.rentACar.business.abstracts.LanguageService;
 import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.constants.messages.Messages;
+import com.etiya.rentACar.business.constants.paths.Paths;
 import com.etiya.rentACar.business.request.messageRequests.CreateMessageRequest;
 import com.etiya.rentACar.business.request.messageRequests.DeleteMessageRequest;
 import com.etiya.rentACar.business.request.messageRequests.UpdateMessageRequest;
@@ -14,7 +15,6 @@ import com.etiya.rentACar.entities.multipleLanguageMessages.Language;
 import com.etiya.rentACar.entities.multipleLanguageMessages.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,17 +23,15 @@ public class MessageManager implements MessageService {
     private MessageDao messageDao;
     private ModelMapperService modelMapperService;
     private MessageService messageService;
-    private Environment environment;
     private LanguageService languageService;
 
 
     @Autowired
-    public MessageManager(MessageDao messageDao, ModelMapperService modelMapperService, @Lazy MessageService messageService, Environment environment,
+    public MessageManager(MessageDao messageDao, ModelMapperService modelMapperService, @Lazy MessageService messageService,
                           @Lazy LanguageService languageService) {
         this.messageDao = messageDao;
         this.modelMapperService = modelMapperService;
         this.messageService=messageService;
-        this.environment = environment;
         this.languageService = languageService;
     }
 
@@ -60,7 +58,7 @@ public class MessageManager implements MessageService {
 
     @Override
     public String getMessage(String messageKey) {
-        int languageId = Integer.parseInt(environment.getProperty("language.id"));
+        int languageId = Integer.parseInt(Paths.LANGUAGEID);
         Language language = languageService.getByLanguageId(languageId);
         if (language == null){
             languageId = 1;

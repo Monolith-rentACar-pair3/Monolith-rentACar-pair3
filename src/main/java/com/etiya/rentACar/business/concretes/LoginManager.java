@@ -2,7 +2,6 @@ package com.etiya.rentACar.business.concretes;
 
 import com.etiya.rentACar.business.abstracts.*;
 import com.etiya.rentACar.business.constants.messages.Messages;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.request.corporateCustomerRequests.CreateCorporateCustomerRequest;

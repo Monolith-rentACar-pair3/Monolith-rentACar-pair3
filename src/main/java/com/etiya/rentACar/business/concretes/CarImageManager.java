@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import com.etiya.rentACar.business.abstracts.CarService;
 import com.etiya.rentACar.business.abstracts.MessageService;
 import com.etiya.rentACar.business.constants.messages.Messages;
+import com.etiya.rentACar.business.constants.paths.Paths;
 import com.etiya.rentACar.core.utilities.results.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.etiya.rentACar.business.abstracts.CarImageService;
@@ -34,18 +34,16 @@ public class CarImageManager implements CarImageService {
 	private ModelMapperService modelMapperService;
 	private CarService carService;
 	private MessageService messageService;
-	private Environment environment;
 	FileHelper fileHelper = new FileHelperManager();
 
 	@Autowired
 	public CarImageManager(CarImageDao carImageDao, ModelMapperService modelMapperService, CarService carService,
-						   MessageService messageService, Environment environment) {
+						   MessageService messageService) {
 		super();
 		this.carImageDao = carImageDao;
 		this.modelMapperService = modelMapperService;
 		this.carService = carService;
 		this.messageService = messageService;
-		this.environment = environment;
 	}
 
 	@Override
@@ -111,7 +109,7 @@ public class CarImageManager implements CarImageService {
 		if (resultCheck != null) {
 			List<CarImage> carImages = new ArrayList<CarImage>();
 			CarImage carImage1 = new CarImage();
-			carImage1.setImagePath(environment.getProperty("default.image.path"));
+			carImage1.setImagePath(Paths.DEFAULTIMAGEPATH);
 			carImage1.setCar(carService.getCarAsElementByCarId(carId));
 			carImages.add(carImage1);
 			List<CarImageSearchListDto> list1 = carImages.stream()
@@ -128,7 +126,7 @@ public class CarImageManager implements CarImageService {
 	}
 
 	private Result checkCarImageCount(int carId) {
-		File file = new File(environment.getProperty("image.subfolder") + carId);
+		File file = new File(Paths.IMAGESUBFOLDER + carId);
 		if (file.exists()) {
 			int numberOfFiles = file.listFiles().length;
 			if (numberOfFiles >= 5) {
@@ -139,7 +137,7 @@ public class CarImageManager implements CarImageService {
 	}
 
 	private Result checkIfThereIsNoPicture(int carId) {
-		File file = new File( environment.getProperty("image.subfolder") + carId);
+		File file = new File( Paths.IMAGESUBFOLDER + carId);
 		if ((file.exists() && file.listFiles().length == 0) || !file.exists()) {
 				return new ErrorResult();
 		}
